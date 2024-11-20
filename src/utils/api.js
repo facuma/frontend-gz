@@ -2,7 +2,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export async function fetchProducts() {
   try {
-    const response = await fetch(`${BASE_URL}/api/products`); // Cambia esta URL si subes el backend a producción
+    const response = await fetch(`${BASE_URL}api/products`); // Cambia esta URL si subes el backend a producción
     const result = await response.json();
     
     if (!response.ok) {
