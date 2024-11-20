@@ -1,8 +1,14 @@
 // next.config.mjs
 // next.config.mjs
-export default {
-    images: {
-      domains: ['d22fxaf9t8d39k.cloudfront.net'],
-    },
-  };
-  
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  images: {
+    domains: ['tubackend.render.com'], // Agrega el dominio de tu backend para cargar imágenes.
+  },
+  env: {
+    NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
+  },
+};
+
+module.exports = nextConfig;
