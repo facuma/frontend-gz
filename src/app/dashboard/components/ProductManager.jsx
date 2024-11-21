@@ -18,7 +18,8 @@ export default function ProductManager() {
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL; // Cambia esto según tu backend
+  const API_URL = "/api/products";
+// Cambia esto según tu backend
 
   // Obtener productos
   useEffect(() => {
@@ -85,32 +86,27 @@ export default function ProductManager() {
   const { token } = useAuth(); // Llamada dentro de un componente funcional
 
   const handleDelete = async (_id) => {
-    console.log("ID recibido para eliminar:", _id);
-
-    if (!_id) {
-      console.error('El ID del producto es inválido o no se ha proporcionado.');
-      return;
-    }
-  
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/${_id}`, {
+      const response = await fetch(`/api/products/${_id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`, // Asegúrate de pasar el token de autorización
+          Authorization: `Bearer ${token}`, // Asegúrate de pasar el token si es necesario
           'Content-Type': 'application/json',
         },
       });
   
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Error desconocido');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error desconocido');
       }
   
-      setProducts(products.filter((product) => product._id !== _id)); // Actualiza la lista local de productos
+      // Actualizar la lista local de productos después de eliminar
+      setProducts(products.filter((product) => product._id !== _id));
     } catch (err) {
       console.error('Error al eliminar el producto:', err.message);
     }
   };
+  
 
   // Preparar edición
   const handleEdit = (product) => {

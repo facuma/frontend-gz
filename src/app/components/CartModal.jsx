@@ -26,7 +26,7 @@ function CartModal({ show, onClose, cartItems, removeFromCart }) {
               {cartItems.map((item, index) => (
                 <li key={index} className="flex justify-between items-center border-b pb-2">
                   <div className="flex items-center">
-                    <img src={`${process.env.NEXT_PUBLIC_STRAPI_API_URL}${item.image.url}`} alt={item.name} className="w-16 h-16 object-cover text-pink-500 mr-4" />
+                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover text-pink-500 mr-4" />
                     <span>{item.name}</span>
                   </div>
                   <div className="flex items-center space-x-2">

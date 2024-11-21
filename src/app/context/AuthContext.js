@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
+import { loginUser } from "@/utils/api"; // Asegúrate de que este path sea correcto.
 
 const AuthContext = createContext();
 
@@ -9,20 +10,10 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
 
   const handleLogin = async (username, password) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Credenciales incorrectas");
-    }
-
-    const data = await response.json();
-    setToken(data.token);
-    setUser({ username }); // Guarda más datos si el backend los proporciona
-    localStorage.setItem("token", data.token);
+    const data = await loginUser({ username, password });
+    setUser(data.user); // Asegúrate de que el backend devuelva un objeto `user`
+    setToken(data.token); // Asegúrate de que el backend devuelva un `token`
+    localStorage.setItem("token", data.token); // Guarda el token en localStorage
   };
 
   const handleLogout = () => {
@@ -38,6 +29,4 @@ export function AuthProvider({ children }) {
   );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => useContext(AuthContext);

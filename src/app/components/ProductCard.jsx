@@ -1,5 +1,5 @@
 "use client"; // Si estás usando Next.js
-
+import Link from 'next/link';
 import React, { useContext } from 'react';
 import { CartContext } from '../context/CartContext'; // Si tienes un contexto para el carrito
 
@@ -19,7 +19,7 @@ function ProductCard({ product }) {
       )}
       <div className="h-60 w-50 py-5 overflow-hidden">
         <img
-          src={product.image.url} // Utiliza la propiedad `url` del objeto de imagen
+          src={product.image} // Utiliza la propiedad `url` del objeto de imagen
           alt={product.name}
           className="w-52 h-auto mx-auto"
         />
@@ -33,12 +33,21 @@ function ProductCard({ product }) {
           )}
           <p className="text-pink-500 font-bold text-lg">${product.discountedPrice}</p>
         </div>
-        <button
-          className="mt-2 bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600"
-          onClick={handleAddToCart}
-        >
-          Agregar al Carrito
-        </button>
+        
+          <button
+            className="mt-2 bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600"
+            onClick={handleAddToCart}
+          >
+            Agregar al Carrito
+          </button>
+          <Link href={`/product/${product._id}`}>
+            <button className="bg-white ml-14 text-pink-500 border-gray-200 border-2 px-4 py-2 rounded hover:bg-pink-200">
+              Ver Producto
+            </button>
+          </Link>
+      
+      
+
       </div>
     </div>
   );
