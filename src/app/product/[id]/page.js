@@ -98,7 +98,6 @@ export default function ProductPage({ params }) {
               Comprar directamente
             </a>
           </div>
-
           {/* Características del producto */}
           <ul className="mt-6 space-y-2 text-gray-700">
             <li>
