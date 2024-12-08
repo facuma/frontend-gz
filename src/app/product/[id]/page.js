@@ -1,27 +1,40 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation"; // Para acceder a los parámetros
 import axios from "axios";
 import { useContext } from "react";
 import { CartContext } from "@/app/context/CartContext";
 
-export default function ProductPage({ params }) {
-    const { addToCart } = useContext(CartContext);
-  const { id } = params; // Obtenemos el ID del producto desde la URL dinámica
+export default function ProductPage() {
+  const { addToCart } = useContext(CartContext);
+  const params = useParams(); // Obtenemos los parámetros de la URL
+  const { slug } = params; // Extraemos el slug del producto
+
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const response = await axios.get(`/api/products/${id}`);
-        setProduct(response.data.data);
+        // Obtenemos el producto por slug
+        const response = await axios.get(`/api/products?slug=${slug}`);
+        const productData = response.data.data;
+
+        if (productData) {
+          setProduct(productData);
+        } else {
+          console.error("Producto no encontrado");
+        }
       } catch (error) {
         console.error("Error al obtener el producto:", error);
       }
     }
-    fetchProduct();
-  }, [id]);
+
+    if (slug) {
+      fetchProduct();
+    }
+  }, [slug]);
 
   if (!product) {
     return <p className="text-center text-gray-500">Cargando producto...</p>;
@@ -30,8 +43,6 @@ export default function ProductPage({ params }) {
   const whatsappbuy = `https://wa.me/543625190474?text=Hola, quiero comprar estos dispositivos: ${encodeURIComponent(
     `${product.name} - Cantidad: ${quantity}`
   )}`;
-
-  
 
   const handleAddToCart = () => {
     addToCart(product); // Agrega el producto al carrito

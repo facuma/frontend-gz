@@ -4,11 +4,20 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['tubackend.render.com'], // Agrega el dominio de tu backend para cargar imágenes.
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ibb.co',
+        pathname: '/**', // Permitir todas las rutas de iBB
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ibb.co', // El dominio donde están alojadas las imágenes reales
+        pathname: '/**',
+      },
+    ], // Agrega el dominio de tu backend para cargar imágenes.
   },
-  experimental: {
-    appDir: true,
-  },
+  
   env: {
     NEXT_PUBLIC_BACKEND_URL: process.env.NEXT_PUBLIC_BACKEND_URL,
   },

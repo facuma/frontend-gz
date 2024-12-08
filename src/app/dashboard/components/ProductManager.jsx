@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useAuth } from '@/app/context/AuthContext';
+import { useAuth } from "@/app/context/AuthContext";
 
 export default function ProductManager() {
   const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
+    slug: "",
     description: "",
     image: "",
     originalPrice: 0,
@@ -19,7 +20,6 @@ export default function ProductManager() {
   const [editId, setEditId] = useState(null);
 
   const API_URL = "/api/products";
-// Cambia esto según tu backend
 
   // Obtener productos
   useEffect(() => {
@@ -41,83 +41,76 @@ export default function ProductManager() {
       [e.target.name]: e.target.value,
     });
   };
-
-  // Crear o editar producto
+  
+  const { token } = useAuth();
+  
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevenir la recarga de la página
+    e.preventDefault();
   
     try {
       if (isEditing) {
-        // Actualizar producto existente
-        const response = await axios.put(`${API_URL}/${editId}`, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await axios.put(`${API_URL}/${formData._id}`, formData, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setProducts(products.map((p) => (p._id === editId ? response.data.data : p)));
+        setProducts(
+          products.map((p) =>
+            p.id === formData.id ? response.data.data : p
+          )
+        );
       } else {
-        // Crear un nuevo producto
         const response = await axios.post(API_URL, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setProducts([...products, response.data.data]); // Asegúrate de usar el producto con _id generado
+        setProducts([...products, response.data.data]);
       }
   
-      // Restablecer el formulario
       setFormData({
-        name: "",
-        description: "",
-        image: "",
+        name: '',
+        slug: '',
+        description: '',
+        image: '',
         originalPrice: 0,
         discountedPrice: 0,
-        category: "",
+        category: '',
         stock: 0,
       });
       setIsEditing(false);
-      setEditId(null);
     } catch (err) {
-      console.error("Error al enviar el formulario:", err.message);
+      console.error('Error al enviar el formulario:', err.message);
     }
   };
   
-
-  const { token } = useAuth(); // Llamada dentro de un componente funcional
-
-  const handleDelete = async (_id) => {
+  const handleDelete = async (identifier) => {
     try {
-      const response = await fetch(`/api/products/${_id}`, {
-        method: 'DELETE',
+      const response = await axios.delete(`${API_URL}/${identifier}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Asegúrate de pasar el token si es necesario
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
       });
   
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error desconocido');
+      if (response.status === 200) {
+        setProducts(
+          products.filter(
+            (product) => product._id !== identifier && product.slug !== identifier
+          )
+        );
       }
-  
-      // Actualizar la lista local de productos después de eliminar
-      setProducts(products.filter((product) => product._id !== _id));
     } catch (err) {
-      console.error('Error al eliminar el producto:', err.message);
+      console.error("Error al eliminar el producto:", err.message);
     }
   };
   
-
-  // Preparar edición
   const handleEdit = (product) => {
     setFormData(product);
     setIsEditing(true);
-    setEditId(product._id);
+    setEditId(product._id || product.slug); // Manejar tanto _id como slug
   };
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl text-black mx-auto justify-center text-center font-bold mb-4">Gestión de Productos</h1>
+      <h1 className="text-2xl text-black mx-auto justify-center text-center font-bold mb-4">
+        Gestión de Productos
+      </h1>
 
       {/* Formulario */}
       <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow mb-4">
@@ -128,6 +121,15 @@ export default function ProductManager() {
             value={formData.name}
             onChange={handleChange}
             placeholder="Nombre del producto"
+            className="p-2 border text-gray-800 rounded"
+            required
+          />
+          <input
+            type="text"
+            name="slug"
+            value={formData.slug}
+            onChange={handleChange}
+            placeholder="Slug del producto"
             className="p-2 border text-gray-800 rounded"
             required
           />
@@ -160,7 +162,6 @@ export default function ProductManager() {
             name="discountedPrice"
             value={formData.discountedPrice}
             onChange={handleChange}
-            
             placeholder="Precio con descuento"
             className="p-2 border text-gray-800 rounded"
           />
@@ -169,7 +170,6 @@ export default function ProductManager() {
             name="category"
             value={formData.category}
             onChange={handleChange}
-            
             placeholder="Categoría"
             className="p-2 border text-gray-800 rounded"
           />
@@ -194,7 +194,8 @@ export default function ProductManager() {
       <table className="w-full bg-white rounded shadow">
         <thead>
           <tr>
-            <th className="border  text-gray-800 p-2">Nombre</th>
+            <th className="border text-gray-800 p-2">Nombre</th>
+            <th className="border text-gray-800 p-2">Slug</th>
             <th className="border text-gray-800 p-2">Descripción</th>
             <th className="border text-gray-800 p-2">Precio</th>
             <th className="border text-gray-800 p-2">Stock</th>
@@ -204,8 +205,8 @@ export default function ProductManager() {
         <tbody>
           {products.map((product) => (
             <tr key={product._id}>
-            <td className="border text-gray-800 p-2">{product._id}</td>
               <td className="border text-gray-800 p-2">{product.name}</td>
+              <td className="border text-gray-800 p-2">{product.slug}</td>
               <td className="border text-gray-800 p-2">{product.description}</td>
               <td className="border text-gray-800 p-2">${product.discountedPrice}</td>
               <td className="border text-gray-800 p-2">{product.stock}</td>

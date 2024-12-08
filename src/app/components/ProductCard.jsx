@@ -40,11 +40,11 @@ function ProductCard({ product }) {
           >
             Agregar al Carrito
           </button>
-          <Link href={`/product/${product._id}`}>
+          {/* <Link href={`/product/${product.slug}`}>
             <button className="bg-white ml-14 text-pink-500 border-gray-200 border-2 px-4 py-2 rounded hover:bg-pink-200">
               Ver Producto
             </button>
-          </Link>
+          </Link> */}
       
       
 
